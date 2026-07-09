@@ -1,19 +1,16 @@
+import BenefitsSection from "@/components/common/BenefitsSection";
+import HeroSection from "@/components/common/HeroSection";
+import ModeSelector from "@/components/common/ModeSelector";
+import SongResultCard from "@/components/common/SongResultCard";
+
 function Home() {
   return (
-    <section className="space-y-4">
-      <p className="text-sm font-medium text-muted-foreground">
-        Daily music recommendation
-      </p>
-
-      <h1 className="text-4xl font-bold tracking-tight">
-        Find one song for today.
-      </h1>
-
-      <p className="max-w-xl text-muted-foreground">
-        Choose your mood and genre, then SongRoulette will pick one track for
-        you.
-      </p>
-    </section>
+    <div className="space-y-10">
+      <HeroSection />
+      <ModeSelector />
+      <SongResultCard />
+      <BenefitsSection />
+    </div>
   );
 }
 
