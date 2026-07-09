@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,10 +18,53 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  discoveryModes,
+  eras,
+  genres,
+  moods,
+} from "@/lib/recommendation-options";
+import type {
+  DiscoveryMode,
+  Era,
+  Genre,
+  Mood,
+  RecommendationMode,
+  RecommendationRequest,
+} from "@/types/recommendation";
 
-const moods = ["Happy", "Chill", "Sad", "Energetic", "Romantic", "Focused"];
+type ModeSelectorProps = {
+  onGenerate: (request: RecommendationRequest) => void;
+};
 
-function ModeSelector() {
+function ModeSelector({ onGenerate }: ModeSelectorProps) {
+  const [mode, setMode] = useState<RecommendationMode>("guided");
+  const [mood, setMood] = useState<Mood>("chill");
+  const [genre, setGenre] = useState<Genre>("indie");
+  const [discovery, setDiscovery] = useState<DiscoveryMode>("balanced");
+  const [era, setEra] = useState<Era>("any");
+  const [allowExplicit, setAllowExplicit] = useState(false);
+
+  function handleGenerate() {
+    if (mode === "random") {
+      onGenerate({
+        mode: "random",
+        allowExplicit,
+      });
+
+      return;
+    }
+
+    onGenerate({
+      mode: "guided",
+      mood,
+      genre,
+      discovery,
+      era,
+      allowExplicit,
+    });
+  }
+
   return (
     <Card className="mx-auto max-w-3xl">
       <CardHeader>
@@ -30,7 +75,11 @@ function ModeSelector() {
       </CardHeader>
 
       <CardContent>
-        <Tabs defaultValue="guided" className="space-y-6">
+        <Tabs
+          value={mode}
+          onValueChange={(value) => setMode(value as RecommendationMode)}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="guided">🎯 Choose my vibe</TabsTrigger>
             <TabsTrigger value="random">🎲 Surprise me</TabsTrigger>
@@ -41,9 +90,14 @@ function ModeSelector() {
               <Label>Mood</Label>
 
               <div className="flex flex-wrap gap-2">
-                {moods.map((mood) => (
-                  <Button key={mood} type="button" variant="outline">
-                    {mood}
+                {moods.map((item) => (
+                  <Button
+                    key={item.value}
+                    type="button"
+                    variant={mood === item.value ? "default" : "outline"}
+                    onClick={() => setMood(item.value)}
+                  >
+                    {item.label}
                   </Button>
                 ))}
               </div>
@@ -53,21 +107,20 @@ function ModeSelector() {
               <div className="space-y-3">
                 <Label>Genre</Label>
 
-                <Select>
+                <Select
+                  value={genre}
+                  onValueChange={(value) => setGenre(value as Genre)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Choose genre" />
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="pop">Pop</SelectItem>
-                    <SelectItem value="rock">Rock</SelectItem>
-                    <SelectItem value="hip-hop">Hip-hop</SelectItem>
-                    <SelectItem value="electronic">Electronic</SelectItem>
-                    <SelectItem value="jazz">Jazz</SelectItem>
-                    <SelectItem value="indie">Indie</SelectItem>
-                    <SelectItem value="metal">Metal</SelectItem>
-                    <SelectItem value="rnb">R&B</SelectItem>
-                    <SelectItem value="lofi">Lo-fi</SelectItem>
+                    {genres.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -75,18 +128,17 @@ function ModeSelector() {
               <div className="space-y-3">
                 <Label>Era</Label>
 
-                <Select>
+                <Select value={era} onValueChange={(value) => setEra(value as Era)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Any time" />
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="any">Any time</SelectItem>
-                    <SelectItem value="new">New music</SelectItem>
-                    <SelectItem value="2000s">2000s</SelectItem>
-                    <SelectItem value="2010s">2010s</SelectItem>
-                    <SelectItem value="2020s">2020s</SelectItem>
-                    <SelectItem value="oldies">Oldies</SelectItem>
+                    {eras.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -96,15 +148,16 @@ function ModeSelector() {
               <Label>Discovery mode</Label>
 
               <div className="grid gap-2 sm:grid-cols-3">
-                <Button type="button" variant="outline">
-                  Popular
-                </Button>
-                <Button type="button" variant="default">
-                  Balanced
-                </Button>
-                <Button type="button" variant="outline">
-                  Hidden gems
-                </Button>
+                {discoveryModes.map((item) => (
+                  <Button
+                    key={item.value}
+                    type="button"
+                    variant={discovery === item.value ? "default" : "outline"}
+                    onClick={() => setDiscovery(item.value)}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
               </div>
             </div>
 
@@ -116,10 +169,13 @@ function ModeSelector() {
                 </p>
               </div>
 
-              <Switch />
+              <Switch
+                checked={allowExplicit}
+                onCheckedChange={setAllowExplicit}
+              />
             </div>
 
-            <Button className="w-full" size="lg">
+            <Button className="w-full" size="lg" onClick={handleGenerate}>
               Get today&apos;s song
             </Button>
           </TabsContent>
@@ -141,10 +197,13 @@ function ModeSelector() {
                 </p>
               </div>
 
-              <Switch />
+              <Switch
+                checked={allowExplicit}
+                onCheckedChange={setAllowExplicit}
+              />
             </div>
 
-            <Button className="w-full" size="lg">
+            <Button className="w-full" size="lg" onClick={handleGenerate}>
               Surprise me
             </Button>
           </TabsContent>
