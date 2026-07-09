@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
+import { Button } from "@/components/ui/button"
 
 function App() {
   const [count, setCount] = useState(0)
@@ -16,7 +17,13 @@ function App() {
           <img src={viteLogo} className="vite" alt="Vite logo" />
         </div>
         <div>
-          <h1>Get started</h1>
+          <h1 className="text-red-500">Get started</h1>
+          <h6 className="text-blue-500">Debil</h6>
+          <div>
+      <Button>Click me</Button>
+      <Button>debil</Button>
+    </div>
+          <h1></h1>
           <p>
             Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
           </p>
