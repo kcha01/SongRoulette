@@ -2,7 +2,8 @@ import random
 
 from app.schemas.recommendation import DailySongRequest, SongResponse
 
-
+# Temporary mock song list.
+# This will later be replaced by real Spotify API results.
 MOCK_SONGS = [
     {
         "id": "1",
@@ -29,8 +30,10 @@ MOCK_SONGS = [
 
 
 def get_daily_song(request: DailySongRequest) -> SongResponse:
+    # Pick a random song from the temporary mock list.
     song = random.choice(MOCK_SONGS)
 
+    # Build tags depending on the recommendation mode.
     if request.mode == "random":
         tags = [
             "Surprise me",
@@ -45,6 +48,7 @@ def get_daily_song(request: DailySongRequest) -> SongResponse:
             "Explicit allowed" if request.allowExplicit else "Clean",
         ]
 
+    # Return data in the shape expected by the frontend.
     return SongResponse(
         id=song["id"],
         title=song["title"],
