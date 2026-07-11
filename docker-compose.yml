@@ -10,7 +10,7 @@ services:
       - ./backend:/app
     environment:
       - PYTHONUNBUFFERED=1
-      - DATABASE_URL=postgresql://songroulette_user:songroulette_password@db:5432/songroulette_db
+      - DATABASE_URL=postgresql+psycopg://songroulette_user:songroulette_password@db:5432/songroulette_db
     depends_on:
       - db
 
