@@ -10,6 +10,9 @@ services:
       - ./backend:/app
     environment:
       - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql://songroulette_user:songroulette_password@db:5432/songroulette_db
+    depends_on:
+      - db
 
   frontend:
     build: ./frontend
@@ -17,7 +20,22 @@ services:
     ports:
       - "5173:5173"
     volumes:
-       - ./frontend:/app
-       - /app/node_modules
+      - ./frontend:/app
+      - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+
+  db:
+    image: postgres:16-alpine
+    container_name: songroulette-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=songroulette_user
+      - POSTGRES_PASSWORD=songroulette_password
+      - POSTGRES_DB=songroulette_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
