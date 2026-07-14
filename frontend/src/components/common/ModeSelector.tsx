@@ -34,10 +34,11 @@ import type {
 } from "@/types/recommendation";
 
 type ModeSelectorProps = {
-  onGenerate: (request: RecommendationRequest) => void;
+  onGenerate: (request: RecommendationRequest) => void | Promise<void>;
+  isLoading?: boolean;
 };
 
-function ModeSelector({ onGenerate }: ModeSelectorProps) {
+function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
   const [mode, setMode] = useState<RecommendationMode>("guided");
   const [mood, setMood] = useState<Mood>("chill");
   const [genre, setGenre] = useState<Genre>("indie");
@@ -175,8 +176,12 @@ function ModeSelector({ onGenerate }: ModeSelectorProps) {
               />
             </div>
 
-            <Button className="w-full" size="lg" onClick={handleGenerate}>
-              Get today&apos;s song
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={handleGenerate}
+              disabled={isLoading}>
+              {isLoading ? "Generating..." : "Get today's song"}
             </Button>
           </TabsContent>
 
@@ -203,8 +208,12 @@ function ModeSelector({ onGenerate }: ModeSelectorProps) {
               />
             </div>
 
-            <Button className="w-full" size="lg" onClick={handleGenerate}>
-              Surprise me
+            <Button
+            className="w-full"
+            size="lg"
+            onClick={handleGenerate}
+            disabled={isLoading}>
+            {isLoading ? "Generating..." : "Surprise me"}
             </Button>
           </TabsContent>
         </Tabs>

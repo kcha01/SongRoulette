@@ -59,11 +59,21 @@ function SongResultCard({ song }: SongResultCardProps) {
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button disabled={!song}>Open in Spotify</Button>
-              <Button variant="outline" disabled={!song}>
-                Add to playlist 🔒
-              </Button>
-            </div>
+  <Button
+    disabled={!song}
+    onClick={() => {
+      if (song) {
+        window.open(song.spotifyUrl, "_blank", "noopener,noreferrer");
+      }
+    }}
+  >
+    Open in Spotify
+  </Button>
+
+  <Button variant="outline" disabled={!song}>
+    Add to playlist 🔒
+  </Button>
+</div>
 
             <p className="text-xs text-muted-foreground">
               Login required to add this song to your Spotify playlist.
