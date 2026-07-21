@@ -8,5 +8,9 @@ class Settings:
         "postgresql+psycopg://songroulette_user:songroulette_password@localhost:5432/songroulette_db",
     )
 
+    # Spotify app credentials loaded from backend/.env.
+    SPOTIFY_CLIENT_ID: str | None = os.getenv("SPOTIFY_CLIENT_ID")
+    SPOTIFY_CLIENT_SECRET: str | None = os.getenv("SPOTIFY_CLIENT_SECRET")
+
 
 settings = Settings()

@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.database.session import engine
-from app.routers import songs
+from app.routers import songs, spotify
 
 # Main FastAPI application instance.
 app = FastAPI(title="SongRoulette API")
@@ -38,3 +38,6 @@ def database_health():
 
 # Register all song-related routes under the main application.
 app.include_router(songs.router)
+
+# Register Spotify-related routes.
+app.include_router(spotify.router)
