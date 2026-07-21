@@ -27,7 +27,11 @@ def get_spotify_access_token() -> str:
     if response.status_code != 200:
         raise HTTPException(
             status_code=502,
-            detail="Failed to get Spotify access token.",
+            detail={
+                "message": "Failed to get Spotify access token.",
+                "spotify_status_code": response.status_code,
+                "spotify_response": response.text,
+            },
         )
 
     data = response.json()
@@ -46,7 +50,11 @@ def test_spotify_connection() -> dict:
     }
 
 
-def search_spotify_tracks(query: str, limit: int = 5) -> list[dict]:
+def search_spotify_tracks(
+    query: str,
+    limit: int = 10,
+    offset: int = 0,
+) -> list[dict]:
     # Search Spotify catalog for tracks matching a query.
     access_token = get_spotify_access_token()
 
@@ -57,6 +65,7 @@ def search_spotify_tracks(query: str, limit: int = 5) -> list[dict]:
             "type": "track",
             "market": "PL",
             "limit": limit,
+            "offset": offset,
         },
         headers={
             "Authorization": f"Bearer {access_token}",
@@ -67,7 +76,12 @@ def search_spotify_tracks(query: str, limit: int = 5) -> list[dict]:
     if response.status_code != 200:
         raise HTTPException(
             status_code=502,
-            detail="Failed to search Spotify tracks.",
+            detail={
+                "message": "Failed to search Spotify tracks.",
+                "spotify_status_code": response.status_code,
+                "spotify_response": response.text,
+                "query": query,
+            },
         )
 
     data = response.json()

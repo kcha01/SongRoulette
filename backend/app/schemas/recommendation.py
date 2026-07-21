@@ -26,4 +26,5 @@ class SongResponse(BaseModel):
     artist: str
     album: str
     spotifyUrl: str
+    coverUrl: Optional[str] = None
     tags: list[str]

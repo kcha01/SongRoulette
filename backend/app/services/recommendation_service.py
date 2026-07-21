@@ -1,59 +1,142 @@
 import random
 
-from app.schemas.recommendation import DailySongRequest, SongResponse
+from fastapi import HTTPException
 
-# Temporary mock song list.
-# This will later be replaced by real Spotify API results.
-MOCK_SONGS = [
-    {
-        "id": "1",
-        "title": "Midnight City",
-        "artist": "M83",
-        "album": "Hurry Up, We're Dreaming",
-        "spotifyUrl": "https://open.spotify.com",
-    },
-    {
-        "id": "2",
-        "title": "Do I Wanna Know?",
-        "artist": "Arctic Monkeys",
-        "album": "AM",
-        "spotifyUrl": "https://open.spotify.com",
-    },
-    {
-        "id": "3",
-        "title": "Sweet Disposition",
-        "artist": "The Temper Trap",
-        "album": "Conditions",
-        "spotifyUrl": "https://open.spotify.com",
-    },
+from app.schemas.recommendation import DailySongRequest, SongResponse
+from app.services.spotify_service import search_spotify_tracks
+
+
+MOOD_QUERY_MAP = {
+    "happy": ["happy", "feel good", "summer"],
+    "chill": ["chill", "relax", "lofi"],
+    "sad": ["sad", "melancholy", "heartbreak"],
+    "energetic": ["workout", "party", "upbeat"],
+    "romantic": ["love", "romantic", "rnb"],
+    "focused": ["focus", "study", "instrumental"],
+}
+
+ERA_QUERY_MAP = {
+    "new": "year:2024-2026",
+    "2000s": "year:2000-2009",
+    "2010s": "year:2010-2019",
+    "2020s": "year:2020-2026",
+    "oldies": "year:1950-1999",
+}
+
+RANDOM_SEARCH_SEEDS = [
+    "love",
+    "night",
+    "dream",
+    "summer",
+    "rain",
+    "fire",
+    "moon",
+    "blue",
+    "dance",
+    "heart",
+    "home",
+    "road",
+    "light",
+    "city",
+    "ocean",
+    "sound",
+    "time",
+    "young",
 ]
 
 
 def get_daily_song(request: DailySongRequest) -> SongResponse:
-    # Pick a random song from the temporary mock list.
-    song = random.choice(MOCK_SONGS)
+    # Generate a Spotify-based song recommendation.
+    query = build_spotify_query(request)
 
-    # Build tags depending on the recommendation mode.
+    # Temporary fixed offset for debugging.
+    # Random offset will be restored after the Spotify query is stable.
+    offset = 0
+
+    tracks = search_spotify_tracks(
+        query=query,
+        limit=10,
+        offset=offset,
+    )
+
+    if not request.allowExplicit:
+        tracks = [track for track in tracks if not track.get("explicit")]
+
+    if not tracks:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "message": "No matching Spotify tracks found.",
+                "query": query,
+            },
+        )
+
+    selected_track = random.choice(tracks)
+
+    return SongResponse(
+        id=selected_track["id"],
+        title=selected_track["title"],
+        artist=selected_track["artist"],
+        album=selected_track["album"],
+        spotifyUrl=selected_track["spotifyUrl"],
+        coverUrl=selected_track.get("coverUrl"),
+        tags=build_tags(request),
+    )
+
+
+def build_spotify_query(request: DailySongRequest) -> str:
+    # Build a simple Spotify Search query from user preferences.
     if request.mode == "random":
-        tags = [
+        return random.choice(RANDOM_SEARCH_SEEDS)
+
+    query_parts: list[str] = []
+
+    if request.mood:
+        mood_queries = MOOD_QUERY_MAP.get(request.mood, [request.mood])
+        query_parts.append(random.choice(mood_queries))
+
+    if request.genre:
+        query_parts.append(request.genre)
+
+    if request.discovery == "hidden-gems":
+        query_parts.append("indie")
+    elif request.discovery == "popular":
+        query_parts.append("hits")
+
+    if request.era and request.era != "any":
+        era_query = ERA_QUERY_MAP.get(request.era)
+
+        if era_query:
+            query_parts.append(era_query)
+
+    if not query_parts:
+        return random.choice(RANDOM_SEARCH_SEEDS)
+
+    return " ".join(query_parts)
+
+
+def build_tags(request: DailySongRequest) -> list[str]:
+    # Build display tags shown on the frontend.
+    if request.mode == "random":
+        return [
             "Surprise me",
             "Explicit allowed" if request.allowExplicit else "Clean",
         ]
-    else:
-        tags = [
-            request.mood or "Mood",
-            request.genre or "Genre",
-            request.discovery or "Discovery",
-            request.era or "Any time",
-            "Explicit allowed" if request.allowExplicit else "Clean",
-        ]
 
-    # Return data in the shape expected by the frontend.
-    return SongResponse(
-        id=song["id"],
-        title=song["title"],
-        artist=song["artist"],
-        album=song["album"],
-        spotifyUrl=song["spotifyUrl"],
-        tags=tags,
-    )
+    tags = []
+
+    if request.mood:
+        tags.append(request.mood)
+
+    if request.genre:
+        tags.append(request.genre)
+
+    if request.discovery:
+        tags.append(request.discovery)
+
+    if request.era:
+        tags.append(request.era)
+
+    tags.append("Explicit allowed" if request.allowExplicit else "Clean")
+
+    return tags
