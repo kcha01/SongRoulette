@@ -6,6 +6,7 @@ import ModeSelector from "@/components/common/ModeSelector";
 import SongResultCard from "@/components/common/SongResultCard";
 import { getDailySong } from "@/services/recommendation.service";
 import type { RecommendationRequest, Song } from "@/types/recommendation";
+import { getAnonymousId } from "@/lib/anonymous-user";
 
 function Home() {
   const [song, setSong] = useState<Song | null>(null);
@@ -17,7 +18,10 @@ function Home() {
       setIsLoading(true);
       setError(null);
 
-      const generatedSong = await getDailySong(request);
+      const generatedSong = await getDailySong({
+        ...request,
+        anonymousId: getAnonymousId(),
+    });
 
       setSong(generatedSong);
     } catch {

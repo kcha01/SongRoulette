@@ -29,19 +29,22 @@ export type Era =
   | "2020s"
   | "oldies";
 
+type BaseRecommendationRequest = {
+  anonymousId?: string;
+  allowExplicit: boolean;
+};
+
 export type RecommendationRequest =
-  | {
+  | ({
       mode: "guided";
       mood: Mood;
       genre: Genre;
       discovery: DiscoveryMode;
       era: Era;
-      allowExplicit: boolean;
-    }
-  | {
+    } & BaseRecommendationRequest)
+  | ({
       mode: "random";
-      allowExplicit: boolean;
-    };
+    } & BaseRecommendationRequest);
 
 export type Song = {
   id: string;

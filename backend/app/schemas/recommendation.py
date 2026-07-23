@@ -9,6 +9,9 @@ class DailySongRequest(BaseModel):
     # "random" means the backend should pick something unexpected.
     mode: Literal["guided", "random"]
 
+    # Anonymous browser identifier used before Spotify login.
+    anonymousId: Optional[str] = None
+
     # Optional fields used only in guided recommendation mode.
     mood: Optional[str] = None
     genre: Optional[str] = None
