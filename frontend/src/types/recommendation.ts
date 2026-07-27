@@ -54,4 +54,5 @@ export type Song = {
   coverUrl?: string;
   spotifyUrl: string;
   tags: string[];
+  isNew: boolean;
 };

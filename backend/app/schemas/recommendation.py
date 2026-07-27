@@ -31,3 +31,6 @@ class SongResponse(BaseModel):
     spotifyUrl: str
     coverUrl: Optional[str] = None
     tags: list[str]
+
+    # True when the song was generated now, false when returned from today's saved pick.
+    isNew: bool

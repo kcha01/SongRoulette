@@ -120,10 +120,11 @@ def generate_spotify_song(request: DailySongRequest) -> SongResponse:
                 id=selected_track["id"],
                 title=selected_track["title"],
                 artist=selected_track["artist"],
-                album=selected_track["album"],
+                album=selected_track["album"] or "",
                 spotifyUrl=selected_track["spotifyUrl"],
                 coverUrl=selected_track.get("coverUrl"),
                 tags=build_tags(request),
+                isNew=True,
             )
 
     raise HTTPException(
@@ -175,6 +176,7 @@ def map_daily_song_to_response(song: DailySong) -> SongResponse:
         spotifyUrl=song.spotify_url,
         coverUrl=song.cover_url,
         tags=build_tags_from_criteria(song.mode, song.criteria_json or {}),
+        isNew=False,
     )
 
 
