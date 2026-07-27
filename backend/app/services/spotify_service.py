@@ -13,7 +13,10 @@ def get_spotify_access_token() -> str:
     if not settings.SPOTIFY_CLIENT_ID or not settings.SPOTIFY_CLIENT_SECRET:
         raise HTTPException(
             status_code=500,
-            detail="Spotify credentials are not configured.",
+            detail={
+                "code": "SPOTIFY_CONFIG_MISSING",
+                "message": "Spotify credentials are not configured.",
+            },
         )
 
     response = httpx.post(
@@ -28,9 +31,9 @@ def get_spotify_access_token() -> str:
         raise HTTPException(
             status_code=502,
             detail={
+                "code": "SPOTIFY_TOKEN_FAILED",
                 "message": "Failed to get Spotify access token.",
                 "spotify_status_code": response.status_code,
-                "spotify_response": response.text,
             },
         )
 
@@ -77,9 +80,9 @@ def search_spotify_tracks(
         raise HTTPException(
             status_code=502,
             detail={
+                "code": "SPOTIFY_SEARCH_FAILED",
                 "message": "Failed to search Spotify tracks.",
                 "spotify_status_code": response.status_code,
-                "spotify_response": response.text,
                 "query": query,
             },
         )

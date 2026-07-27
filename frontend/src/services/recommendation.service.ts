@@ -2,20 +2,89 @@ import type { RecommendationRequest, Song } from "@/types/recommendation";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
+type ApiErrorDetail = {
+  code?: string;
+  message?: string;
+};
+
+type ApiErrorResponse = {
+  detail?: string | ApiErrorDetail;
+};
+
 export async function getDailySong(
-  request: RecommendationRequest
+  request: RecommendationRequest,
 ): Promise<Song> {
-  const response = await fetch(`${API_URL}/songs/daily`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(request),
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_URL}/songs/daily`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    });
+  } catch {
+    throw new Error(
+      "Cannot connect to the server. Make sure the backend is running and try again.",
+    );
+  }
 
   if (!response.ok) {
-    throw new Error("Failed to generate daily song");
+    const errorResponse = await readErrorResponse(response);
+
+    throw new Error(getDailySongErrorMessage(response.status, errorResponse));
   }
 
   return response.json();
+}
+
+async function readErrorResponse(
+  response: Response,
+): Promise<ApiErrorResponse | null> {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function getDailySongErrorMessage(
+  status: number,
+  errorResponse: ApiErrorResponse | null,
+): string {
+  const detail = errorResponse?.detail;
+
+  const errorCode =
+    typeof detail === "object" && detail !== null ? detail.code : undefined;
+
+  if (errorCode === "NO_SONG_FOUND" || status === 404) {
+    return "We couldn't find a song for these filters. Try changing your mood, genre, or allowing explicit songs.";
+  }
+
+  if (
+    errorCode === "SPOTIFY_SEARCH_FAILED" ||
+    errorCode === "SPOTIFY_TOKEN_FAILED" ||
+    status === 502
+  ) {
+    return "Spotify is temporarily unavailable. Please try again in a moment.";
+  }
+
+  if (errorCode === "SPOTIFY_CONFIG_MISSING" || status === 500) {
+    return "The server is not configured correctly. Please check backend environment variables.";
+  }
+
+  if (status === 422) {
+    return "Some recommendation options are invalid. Please refresh the page and try again.";
+  }
+
+  if (typeof detail === "string") {
+    return detail;
+  }
+
+  if (typeof detail === "object" && detail?.message) {
+    return detail.message;
+  }
+
+  return "Something went wrong while generating your song.";
 }

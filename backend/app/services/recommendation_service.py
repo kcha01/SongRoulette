@@ -130,6 +130,7 @@ def generate_spotify_song(request: DailySongRequest) -> SongResponse:
     raise HTTPException(
         status_code=404,
         detail={
+            "code": "NO_SONG_FOUND",
             "message": "No matching Spotify tracks found after multiple attempts.",
             "queries": query_candidates,
         },

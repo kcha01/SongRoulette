@@ -4,9 +4,9 @@ import BenefitsSection from "@/components/common/BenefitsSection";
 import HeroSection from "@/components/common/HeroSection";
 import ModeSelector from "@/components/common/ModeSelector";
 import SongResultCard from "@/components/common/SongResultCard";
+import { getAnonymousId } from "@/lib/anonymous-user";
 import { getDailySong } from "@/services/recommendation.service";
 import type { RecommendationRequest, Song } from "@/types/recommendation";
-import { getAnonymousId } from "@/lib/anonymous-user";
 
 function Home() {
   const [song, setSong] = useState<Song | null>(null);
@@ -21,11 +21,15 @@ function Home() {
       const generatedSong = await getDailySong({
         ...request,
         anonymousId: getAnonymousId(),
-    });
+      });
 
       setSong(generatedSong);
-    } catch {
-      setError("Something went wrong while generating your song.");
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Something went wrong while generating your song.");
+      }
     } finally {
       setIsLoading(false);
     }
