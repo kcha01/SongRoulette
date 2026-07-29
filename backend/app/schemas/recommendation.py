@@ -11,7 +11,7 @@ class DailySongRequest(BaseModel):
 
     # Anonymous browser identifier used before Spotify login.
     # The frontend generates it with crypto.randomUUID().
-    anonymousId: Optional[str] = Field(
+    anonymousId: str = Field(
         default=None,
         min_length=8,
         max_length=64,

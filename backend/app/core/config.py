@@ -14,11 +14,17 @@ class Settings:
     SPOTIFY_CLIENT_SECRET: str | None = os.getenv("SPOTIFY_CLIENT_SECRET")
 
     # Comma-separated list of frontend URLs allowed to call the backend.
-    # Example:
-    # BACKEND_CORS_ORIGINS=http://localhost:5173,https://songroulette.vercel.app
     BACKEND_CORS_ORIGINS: str = os.getenv(
         "BACKEND_CORS_ORIGINS",
         "http://localhost:5173,http://127.0.0.1:5173",
+    )
+
+    # Basic MVP rate limits for the daily song endpoint.
+    SONGS_DAILY_RATE_LIMIT_PER_MINUTE: int = int(
+        os.getenv("SONGS_DAILY_RATE_LIMIT_PER_MINUTE", "3")
+    )
+    SONGS_DAILY_RATE_LIMIT_PER_HOUR: int = int(
+        os.getenv("SONGS_DAILY_RATE_LIMIT_PER_HOUR", "20")
     )
 
     @property
