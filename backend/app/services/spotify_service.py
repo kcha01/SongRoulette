@@ -107,4 +107,6 @@ def map_spotify_track(track: dict) -> dict:
         "spotifyUrl": track.get("external_urls", {}).get("spotify"),
         "coverUrl": images[0].get("url") if images else None,
         "explicit": track.get("explicit", False),
-    }
+        "popularity": track.get("popularity", 0),
+        "releaseDate": album.get("release_date"),
+    }   

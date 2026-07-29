@@ -15,11 +15,11 @@ class DailySongRequest(BaseModel):
     # Optional fields used only in guided recommendation mode.
     mood: Optional[str] = None
     genre: Optional[str] = None
-    discovery: Optional[str] = None
     era: Optional[str] = None
 
-    # Defines whether explicit songs can be included in the result.
-    allowExplicit: bool = False
+    # Explicit songs are allowed by default.
+    # This field is kept for backend compatibility, but it is no longer shown in the UI.
+    allowExplicit: bool = True
 
 
 class SongResponse(BaseModel):

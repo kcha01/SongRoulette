@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import type {
-  DiscoveryMode,
   Era,
   Genre,
   Mood,
@@ -36,12 +35,6 @@ const genres: { value: Genre; label: string }[] = [
   { value: "lofi", label: "Lo-fi" },
 ];
 
-const discoveryModes: { value: DiscoveryMode; label: string }[] = [
-  { value: "popular", label: "Popular" },
-  { value: "balanced", label: "Balanced" },
-  { value: "hidden-gems", label: "Hidden gems" },
-];
-
 const eras: { value: Era; label: string }[] = [
   { value: "any", label: "Any era" },
   { value: "new", label: "New releases" },
@@ -55,15 +48,12 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
   const [mode, setMode] = useState<RecommendationMode>("guided");
   const [mood, setMood] = useState<Mood>("chill");
   const [genre, setGenre] = useState<Genre>("indie");
-  const [discovery, setDiscovery] = useState<DiscoveryMode>("balanced");
   const [era, setEra] = useState<Era>("any");
-  const [allowExplicit, setAllowExplicit] = useState(false);
 
   function handleGenerate() {
     if (mode === "random") {
       onGenerate({
         mode: "random",
-        allowExplicit,
       });
 
       return;
@@ -73,9 +63,7 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
       mode: "guided",
       mood,
       genre,
-      discovery,
       era,
-      allowExplicit,
     });
   }
 
@@ -88,7 +76,7 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
           </h2>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Choose your preferences or let SongRoulette pick something
+            Choose your mood and genre, or let SongRoulette pick something
             unexpected.
           </p>
         </div>
@@ -137,6 +125,7 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-2">
                 <span className="text-sm font-medium">Genre</span>
+
                 <select
                   value={genre}
                   onChange={(event) => setGenre(event.target.value as Genre)}
@@ -153,6 +142,7 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
 
               <label className="space-y-2">
                 <span className="text-sm font-medium">Era</span>
+
                 <select
                   value={era}
                   onChange={(event) => setEra(event.target.value as Era)}
@@ -167,43 +157,12 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
                 </select>
               </label>
             </div>
-
-            <div>
-              <p className="mb-3 text-sm font-medium">Discovery mode</p>
-
-              <div className="grid gap-3 sm:grid-cols-3">
-                {discoveryModes.map((item) => (
-                  <Button
-                    key={item.value}
-                    type="button"
-                    variant={discovery === item.value ? "default" : "outline"}
-                    onClick={() => setDiscovery(item.value)}
-                    disabled={isLoading}
-                  >
-                    {item.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
           </div>
         )}
 
-        <label className="flex items-center justify-between gap-4 rounded-2xl border bg-background p-4">
-          <div>
-            <p className="text-sm font-medium">Allow explicit songs</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Include tracks marked as explicit.
-            </p>
-          </div>
-
-          <input
-            type="checkbox"
-            checked={allowExplicit}
-            onChange={(event) => setAllowExplicit(event.target.checked)}
-            disabled={isLoading}
-            className="h-5 w-5"
-          />
-        </label>
+        <div className="rounded-2xl border bg-background p-4 text-sm text-muted-foreground">
+          Songs marked as explicit may appear in recommendations.
+        </div>
 
         <Button
           type="button"

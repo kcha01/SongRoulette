@@ -5,9 +5,9 @@ const benefits = [
       "Generate a daily recommendation without creating an account or connecting Spotify.",
   },
   {
-    title: "Personalized filters",
+    title: "Simple filters",
     description:
-      "Use mood, genre, discovery mode, era, and explicit content preference to shape the result.",
+      "Use mood, genre, and era to shape your daily recommendation.",
   },
   {
     title: "Built for growth",

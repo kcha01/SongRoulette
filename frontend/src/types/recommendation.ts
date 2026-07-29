@@ -19,8 +19,6 @@ export type Genre =
   | "rnb"
   | "lofi";
 
-export type DiscoveryMode = "popular" | "balanced" | "hidden-gems";
-
 export type Era =
   | "any"
   | "new"
@@ -31,7 +29,6 @@ export type Era =
 
 type BaseRecommendationRequest = {
   anonymousId?: string;
-  allowExplicit: boolean;
 };
 
 export type RecommendationRequest =
@@ -39,7 +36,6 @@ export type RecommendationRequest =
       mode: "guided";
       mood: Mood;
       genre: Genre;
-      discovery: DiscoveryMode;
       era: Era;
     } & BaseRecommendationRequest)
   | ({
