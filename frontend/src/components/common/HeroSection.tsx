@@ -1,28 +1,48 @@
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 function HeroSection() {
   return (
-    <section className="mx-auto flex max-w-3xl flex-col items-center gap-6 py-16 text-center">
-      <div className="rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
-        No login required to generate a song
-      </div>
+    <section className="overflow-hidden rounded-3xl border bg-card p-8 shadow-sm sm:p-10 lg:p-12">
+      <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+        <div className="space-y-5">
+          <Badge variant="secondary" className="w-fit">
+            Spotify-powered daily discovery
+          </Badge>
 
-      <div className="space-y-4">
-        <h1 className="text-5xl font-bold tracking-tight md:text-6xl">
-          Find your song for today.
-        </h1>
+          <div className="space-y-4">
+            <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+              Discover one Spotify song every day.
+            </h1>
 
-        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          Choose your vibe or let SongRoulette surprise you with a random
-          Spotify track.
-        </p>
-      </div>
+            <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+              SongRoulette gives you one daily recommendation. Choose your mood,
+              pick a genre, or let the app surprise you with a random track.
+            </p>
+          </div>
+        </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Button size="lg">Choose my vibe</Button>
-        <Button size="lg" variant="secondary">
-          Surprise me
-        </Button>
+        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+          <div className="rounded-2xl border bg-background p-4">
+            <p className="text-sm font-semibold">No login required</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Start instantly.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border bg-background p-4">
+            <p className="text-sm font-semibold">Real Spotify tracks</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Powered by Spotify API.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border bg-background p-4">
+            <p className="text-sm font-semibold">One pick per day</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Come back tomorrow.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

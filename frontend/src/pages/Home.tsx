@@ -36,20 +36,28 @@ function Home() {
   }
 
   return (
-    <div className="space-y-10">
-      <HeroSection />
+    <div className="w-full">
+      <div className="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+        <HeroSection />
 
-      <ModeSelector onGenerate={handleGenerate} isLoading={isLoading} />
+        <div className="grid items-start gap-8 lg:grid-cols-2">
+          <div className="h-full">
+            <ModeSelector onGenerate={handleGenerate} isLoading={isLoading} />
+          </div>
 
-      {error && (
-        <div className="mx-auto max-w-3xl rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-          {error}
+          <div className="h-full">
+            <SongResultCard song={song} />
+          </div>
         </div>
-      )}
 
-      <SongResultCard song={song} />
+        {error && (
+          <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+            {error}
+          </div>
+        )}
 
-      <BenefitsSection />
+        <BenefitsSection />
+      </div>
     </div>
   );
 }

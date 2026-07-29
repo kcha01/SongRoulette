@@ -3,7 +3,7 @@ import {NavLink} from "react-router";
 function Navbar() {
     return (
     <header className="border-b">
-      <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <NavLink to="/" className="text-xl font-bold">
           🎵 SongRoulette
         </NavLink>
