@@ -27,6 +27,9 @@ def get_spotify_access_token() -> str:
         timeout=10,
     )
 
+    if response.status_code == 429:
+        raise spotify_rate_limit_exception(response)
+
     if response.status_code != 200:
         raise HTTPException(
             status_code=502,
@@ -76,6 +79,9 @@ def search_spotify_tracks(
         timeout=10,
     )
 
+    if response.status_code == 429:
+        raise spotify_rate_limit_exception(response)
+
     if response.status_code != 200:
         raise HTTPException(
             status_code=502,
@@ -91,6 +97,24 @@ def search_spotify_tracks(
     items = data.get("tracks", {}).get("items", [])
 
     return [map_spotify_track(item) for item in items]
+
+
+def spotify_rate_limit_exception(response: httpx.Response) -> HTTPException:
+    retry_after = response.headers.get("Retry-After")
+
+    try:
+        retry_after_seconds = int(retry_after) if retry_after else 60
+    except ValueError:
+        retry_after_seconds = 60
+
+    return HTTPException(
+        status_code=503,
+        detail={
+            "code": "SPOTIFY_RATE_LIMITED",
+            "message": "Spotify is temporarily rate limited. Please try again later.",
+            "retryAfterSeconds": retry_after_seconds,
+        },
+    )
 
 
 def map_spotify_track(track: dict) -> dict:
@@ -109,4 +133,4 @@ def map_spotify_track(track: dict) -> dict:
         "explicit": track.get("explicit", False),
         "popularity": track.get("popularity", 0),
         "releaseDate": album.get("release_date"),
-    }   
+    }

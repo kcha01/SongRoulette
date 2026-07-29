@@ -92,6 +92,10 @@ function getDailySongErrorMessage(
     return "We couldn't find a song for these filters. Try changing your mood or genre.";
   }
 
+    if (errorCode === "SPOTIFY_RATE_LIMITED" || status === 503) {
+    return "Spotify is busy right now. Please wait a moment and try again.";
+  }
+
   if (
     errorCode === "SPOTIFY_SEARCH_FAILED" ||
     errorCode === "SPOTIFY_TOKEN_FAILED" ||
