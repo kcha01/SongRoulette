@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class DailySongRequest(BaseModel):
@@ -10,7 +10,13 @@ class DailySongRequest(BaseModel):
     mode: Literal["guided", "random"]
 
     # Anonymous browser identifier used before Spotify login.
-    anonymousId: Optional[str] = None
+    # The frontend generates it with crypto.randomUUID().
+    anonymousId: Optional[str] = Field(
+        default=None,
+        min_length=8,
+        max_length=64,
+        pattern=r"^[a-zA-Z0-9_-]+$",
+    )
 
     # Optional fields used only in guided recommendation mode.
     mood: Optional[str] = None
