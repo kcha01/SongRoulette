@@ -12,6 +12,8 @@ import type {
 type ModeSelectorProps = {
   onGenerate: (request: RecommendationRequest) => void | Promise<void>;
   isLoading?: boolean;
+  isGenerateDisabled?: boolean;
+  cooldownSeconds?: number;
 };
 
 const moods: { value: Mood; label: string }[] = [
@@ -44,13 +46,22 @@ const eras: { value: Era; label: string }[] = [
   { value: "oldies", label: "Oldies" },
 ];
 
-function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
+function ModeSelector({
+  onGenerate,
+  isLoading = false,
+  isGenerateDisabled = false,
+  cooldownSeconds = 0,
+}: ModeSelectorProps) {
   const [mode, setMode] = useState<RecommendationMode>("guided");
   const [mood, setMood] = useState<Mood>("chill");
   const [genre, setGenre] = useState<Genre>("indie");
   const [era, setEra] = useState<Era>("any");
 
   function handleGenerate() {
+    if (isGenerateDisabled) {
+      return;
+    }
+
     if (mode === "random") {
       onGenerate({
         mode: "random",
@@ -86,7 +97,7 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
             type="button"
             variant={mode === "guided" ? "default" : "outline"}
             onClick={() => setMode("guided")}
-            disabled={isLoading}
+            disabled={isGenerateDisabled}
           >
             Choose my vibe
           </Button>
@@ -95,7 +106,7 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
             type="button"
             variant={mode === "random" ? "default" : "outline"}
             onClick={() => setMode("random")}
-            disabled={isLoading}
+            disabled={isGenerateDisabled}
           >
             Surprise me
           </Button>
@@ -114,7 +125,7 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
                     size="sm"
                     variant={mood === item.value ? "default" : "outline"}
                     onClick={() => setMood(item.value)}
-                    disabled={isLoading}
+                    disabled={isGenerateDisabled}
                   >
                     {item.label}
                   </Button>
@@ -129,8 +140,8 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
                 <select
                   value={genre}
                   onChange={(event) => setGenre(event.target.value as Genre)}
-                  disabled={isLoading}
-                  className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+                  disabled={isGenerateDisabled}
+                  className="h-10 w-full rounded-md border bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {genres.map((item) => (
                     <option key={item.value} value={item.value}>
@@ -146,8 +157,8 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
                 <select
                   value={era}
                   onChange={(event) => setEra(event.target.value as Era)}
-                  disabled={isLoading}
-                  className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+                  disabled={isGenerateDisabled}
+                  className="h-10 w-full rounded-md border bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {eras.map((item) => (
                     <option key={item.value} value={item.value}>
@@ -167,10 +178,14 @@ function ModeSelector({ onGenerate, isLoading = false }: ModeSelectorProps) {
         <Button
           type="button"
           onClick={handleGenerate}
-          disabled={isLoading}
+          disabled={isGenerateDisabled}
           className="mt-auto"
         >
-          {isLoading ? "Generating..." : "Get today's song"}
+          {isLoading
+            ? "Generating..."
+            : cooldownSeconds > 0
+              ? `Try again in ${cooldownSeconds}s`
+              : "Get today's song"}
         </Button>
       </div>
     </section>

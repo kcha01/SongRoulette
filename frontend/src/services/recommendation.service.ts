@@ -5,11 +5,24 @@ const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 type ApiErrorDetail = {
   code?: string;
   message?: string;
+  retryAfterSeconds?: number;
 };
 
 type ApiErrorResponse = {
   detail?: string | ApiErrorDetail;
 };
+
+export class DailySongApiError extends Error {
+  code?: string;
+  retryAfterSeconds?: number;
+
+  constructor(message: string, code?: string, retryAfterSeconds?: number) {
+    super(message);
+    this.name = "DailySongApiError";
+    this.code = code;
+    this.retryAfterSeconds = retryAfterSeconds;
+  }
+}
 
 export async function getDailySong(
   request: RecommendationRequest,
@@ -25,15 +38,28 @@ export async function getDailySong(
       body: JSON.stringify(request),
     });
   } catch {
-    throw new Error(
+    throw new DailySongApiError(
       "Cannot connect to the server. Make sure the backend is running and try again.",
     );
   }
 
   if (!response.ok) {
     const errorResponse = await readErrorResponse(response);
+    const detail = errorResponse?.detail;
 
-    throw new Error(getDailySongErrorMessage(response.status, errorResponse));
+    const code =
+      typeof detail === "object" && detail !== null ? detail.code : undefined;
+
+    const retryAfterSeconds =
+      typeof detail === "object" && detail !== null
+        ? detail.retryAfterSeconds
+        : undefined;
+
+    throw new DailySongApiError(
+      getDailySongErrorMessage(response.status, errorResponse),
+      code,
+      retryAfterSeconds,
+    );
   }
 
   return response.json();
@@ -58,8 +84,12 @@ function getDailySongErrorMessage(
   const errorCode =
     typeof detail === "object" && detail !== null ? detail.code : undefined;
 
+  if (errorCode === "RATE_LIMIT_EXCEEDED" || status === 429) {
+    return "Too many requests. Please wait a moment and try again.";
+  }
+
   if (errorCode === "NO_SONG_FOUND" || status === 404) {
-    return "We couldn't find a song for these filters. Try changing your mood, genre, or allowing explicit songs.";
+    return "We couldn't find a song for these filters. Try changing your mood or genre.";
   }
 
   if (
